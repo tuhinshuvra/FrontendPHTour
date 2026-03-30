@@ -1,9 +1,11 @@
-function App() {
+import { Outlet } from "react-router"
+import { CommonLayout } from "./components/layout/CommonLayout"
 
+function App() {
   return (
-    <>
-      <h2>This is a simple ReactApp, Using ShadCN</h2>
-    </>
+    <CommonLayout>
+      <Outlet></Outlet>
+    </CommonLayout>
   )
 }
 
