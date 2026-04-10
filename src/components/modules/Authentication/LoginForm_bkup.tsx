@@ -13,6 +13,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import config from "@/config";
 
 /* ------------------ ZOD SCHEMA ------------------ */
 const loginSchema = z.object({
@@ -62,8 +63,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         try {
             const res = await login(data).unwrap();
 
-            toast.success("Login successful");
-            navigate("/");
+            if (res.success) {
+                toast.success("Login successful");
+                navigate("/");
+            }
         } catch (error: any) {
             console.error(error);
 
@@ -82,9 +85,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     };
 
     /* ------------------ GOOGLE LOGIN ------------------ */
+    // const handleGoogleLogin = () => {
+    //     window.location.href = "http://localhost:5000/api/v1/auth/google";
+    // };
+
     const handleGoogleLogin = () => {
-        window.location.href =
-            "http://localhost:5000/api/v1/auth/google";
+        window.location.assign(`${config.baseUrl}/auth/google`);
     };
 
     return (

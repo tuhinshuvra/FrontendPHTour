@@ -1,69 +1,128 @@
 import Logo from "@/assets/icons/Logo";
+import { Button } from "@/components/ui/button";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Link } from "react-router";
 import { ModeToggle } from "./ModeToggler";
+import { authApi, useLogoutMutation, useUserInfoQuery } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hook";
 
-const Navbar = () => {
+// Navigation links array to be used in both desktop and mobile menus
+const navigationLinks = [
+    { active: true, href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+];
+
+export default function Component() {
+
+    // const { data } = useUserInfoQuery(undefined);
+    const { data } = useUserInfoQuery(undefined);
+    const [logout] = useLogoutMutation();
+    const dispatch = useAppDispatch();
+    // console.log("useUserInfoQuery : ", data.data);
+
+    const handleLogout = async () => {
+        await logout(undefined);
+        dispatch(authApi.util.resetApiState());
+
+    }
+
+
     return (
-        <div>
-            <header className="bg-blue-200">
-                <div className="mx-auto flex h-16 max-w-container items-center gap-8 px-4 sm:px-6 lg:px-8">
-                    <a className="block text-teal-600" href="#">
-                        <span className="sr-only">Home</span>
-                        <Logo></Logo>
-                    </a>
-
-                    <div className="flex flex-1 items-center justify-end md:justify-between">
-                        <nav aria-label="Global" className="hidden md:block">
-                            <ul className="flex items-center gap-6 text-sm">
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> About </a>
-                                </li>
-
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> Careers </a>
-                                </li>
-
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> History </a>
-                                </li>
-
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> Services </a>
-                                </li>
-
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> Projects </a>
-                                </li>
-
-                                <li>
-                                    <a className="text-gray-500 transition hover:text-gray-500/75" href="#"> Blog </a>
-                                </li>
-                            </ul>
-                        </nav>
-
-                        <div className="flex items-center gap-4">
-                            <div className="sm:flex sm:gap-4">
-                                <ModeToggle></ModeToggle>
-                                <a className="block rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700" href="#">
-                                    Login
-                                </a>
-
-                                <a className="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 transition hover:text-teal-600/75 sm:block" href="#">
-                                    Register
-                                </a>
-                            </div>
-
-                            <button className="block rounded-sm bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden">
-                                <span className="sr-only">Toggle menu</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-                                </svg>
-                            </button>
-                        </div>
+        <header className="border-b px-4 md:px-6">
+            <div className="flex h-16 justify-between gap-4">
+                {/* Left side */}
+                <div className="flex gap-2">
+                    <div className="flex items-center md:hidden">
+                        {/* Mobile menu trigger */}
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button className="group size-8" size="icon" variant="ghost">
+                                    <svg
+                                        className="pointer-events-none"
+                                        fill="none"
+                                        height={16}
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        width={16}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            className="-translate-y-[7px] origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
+                                            d="M4 12L20 12"
+                                        />
+                                        <path
+                                            className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
+                                            d="M4 12H20"
+                                        />
+                                        <path
+                                            className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
+                                            d="M4 12H20"
+                                        />
+                                    </svg>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-36 p-1 md:hidden">
+                                <NavigationMenu className="max-w-none *:w-full">
+                                    <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
+                                        {navigationLinks.map((link, index) => (
+                                            <NavigationMenuItem
+                                                className="w-full"
+                                                key={String(index)}
+                                            >
+                                                <NavigationMenuLink className="py-1.5">
+                                                    <Link to={link.href}>{link.label}</Link>
+                                                </NavigationMenuLink>
+                                            </NavigationMenuItem>
+                                        ))}
+                                    </NavigationMenuList>
+                                </NavigationMenu>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                    {/* Main nav */}
+                    <div className="flex items-center gap-6">
+                        <Link className="text-primary hover:text-primary/90" to="/">
+                            <Logo />
+                        </Link>
+                        {/* Navigation menu */}
+                        <NavigationMenu className="h-full *:h-full max-md:hidden">
+                            <NavigationMenuList className="h-full gap-2">
+                                {navigationLinks.map((link, index) => (
+                                    <NavigationMenuItem className="h-full" key={String(index)}>
+                                        <NavigationMenuLink
+                                            asChild
+                                            className="h-full justify-center rounded-none border-transparent border-y-2 py-1.5 font-medium text-muted-foreground hover:border-b-primary hover:bg-transparent hover:text-primary data-[active]:border-b-primary data-[active]:bg-transparent!"
+                                        >
+                                            <Link to={link.href}>{link.label}</Link>
+                                        </NavigationMenuLink>
+                                    </NavigationMenuItem>
+                                ))}
+                            </NavigationMenuList>
+                        </NavigationMenu>
                     </div>
                 </div>
-            </header>
-        </div>
+                {/* Right side */}
+                <div className="flex items-center gap-2">
+                    <ModeToggle />
+                    {data?.data?.email && (
+                        <Button onClick={handleLogout}
+                            variant={"outline"}
+                            className="text-sm"
+                            size="sm">
+                            <Link to="/">Logout</Link>
+                        </Button>
+                    )}
+                    {!data?.data?.email && (
+                        <Button asChild className="text-sm" size="sm">
+                            <Link to="/login">Login</Link>
+                        </Button>
+                    )}
+                </div>
+            </div>
+        </header>
     );
-};
-
-export default Navbar;
+}
