@@ -1,35 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import SingleImageUploader from "@/components/SingleImageUploader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAddTourTypeMutation } from "@/redux/features/tour/tour.api";
+import { Textarea } from "@/components/ui/textarea";
+import { useAddNewDivisionMutation } from "@/redux/features/division/division.api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export function AddTourTypeModal() {
+export function AddDivisionModal() {
     const [open, setOpen] = useState(false);
-    const form = useForm();
-    const [addTourType] = useAddTourTypeMutation();
+    const [image, setImage] = useState<File | null>(null)
+    const [addDivision] = useAddNewDivisionMutation();
+
+    // console.log("Inside add division modal", image);
+    const form = useForm({
+        defaultValues: {
+            name: "",
+            description: "",
+        },
+    });
 
     const onSubmit = async (data) => {
         const toastId = toast.loading("Adding...");
+        const formData = new FormData();
+
+        formData.append("data", JSON.stringify(data));
+        formData.append("file", image as File);
 
         try {
-            const res = await addTourType({ name: data.name }).unwrap();
+            const res = await addDivision(formData).unwrap();
 
             if (res.success) {
-                toast.success("Successfully Added Tour Type", { id: toastId });
-
-                form.reset();
+                toast.success("Successfully  added division", { id: toastId })
                 setOpen(false);
+
             }
+            // console.log("Add Division: ", res);
+
         } catch (error: any) {
             console.log(error);
-
             toast.error(
-                error?.data?.message || "Tour type already exists",
+                error?.data?.message || "Division already exists",
                 { id: toastId }
             );
         }
@@ -38,25 +52,25 @@ export function AddTourTypeModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="default">Add Tour Type</Button>
+                <Button variant="default">Add Division</Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Add Tour Type</DialogTitle>
+                    <DialogTitle>Add Division</DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
-                    <form id="add-tour-type" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form id="add-division" onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             control={form.control}
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Tour Type Name</FormLabel>
+                                    <FormLabel>Division Name</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="Enter Tour Type Name"
+                                            placeholder="Enter Division Name"
                                             {...field}
                                         />
                                     </FormControl>
@@ -64,7 +78,27 @@ export function AddTourTypeModal() {
                                 </FormItem>)
                             }
                         />
+
+                        <br />
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>)
+                            }
+                        />
+                        <br />
+
                     </form>
+                    <SingleImageUploader
+                        onChange={setImage}
+                    />
                 </Form>
 
                 <DialogFooter>
@@ -72,7 +106,7 @@ export function AddTourTypeModal() {
                         <Button variant="outline">Cancel</Button>
                     </DialogClose>
 
-                    <Button type="submit" form="add-tour-type">
+                    <Button disabled={!image} type="submit" form="add-division">
                         Save changes
                     </Button>
                 </DialogFooter>

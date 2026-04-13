@@ -6,7 +6,7 @@ export const userSidebarItems: ISidebarItem[] = [
         title: "History",
         items: [
             {
-                title: "Bookings",
+                title: "Manage Bookings",
                 url: "/user/bookings",
                 component: Bookings,
             },

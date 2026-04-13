@@ -1,33 +1,17 @@
 import { DeleteConfirmation } from "@/components/DeleteConfirmation";
-import { AddTourTypeModal } from "@/components/modules/Admin/TourType/AddTourTypeModal";
+import { AddDivisionModal } from "@/components/modules/Admin/Division/AddDivisionModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useGetTourTypesQuery, useRemoveTourTypeMutation } from "@/redux/features/tour/tour.api";
+import { useGetAllDivisionsQuery, useRemoveDivisionMutation } from "@/redux/features/division/division.api";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-const AddTourType = () => {
-    const { data } = useGetTourTypesQuery(undefined);
-    const [removeTourType] = useRemoveTourTypeMutation();
+const AddDivision = () => {
+    const { data } = useGetAllDivisionsQuery(undefined);
+    const [removeDivision] = useRemoveDivisionMutation();
 
-    // const handleRemoveTourType = async (tourId: string) => {
-    //     const toastId = toast.loading("Removing...");
-    //     try {
-    //         const res = await removeTourType(tourId).unwrap();
-    //         if (res.success) {
-    //             toast.success("Removed", { id: toastId })
-    //         } else {
-    //             toast.error("Failed to remove", { id: toastId });
-    //         }
-
-    //     } catch (error) {
-    //         console.log(error);
-    //         toast.error("Something went wrong", { id: toastId });
-    //     }
-    // }
-
-    const handleRemoveTourType = async (tourId: string) => {
+    const handleRemoveDivision = async (tourId: string) => {
         toast.promise(
-            removeTourType(tourId).unwrap(),
+            removeDivision(tourId).unwrap(),
             {
                 loading: "Removing...",
                 success: "Removed Successfully ",
@@ -36,6 +20,10 @@ const AddTourType = () => {
         );
     };
 
+    console.log("All Divisions: ", data);
+
+
+
     return (
         <div className="w-full max-w-6xl mx-auto py-10">
             <div className=" rounded-xl border border-gray-200 dark:border-gray-800  overflow-hidden ">
@@ -43,13 +31,13 @@ const AddTourType = () => {
 
                     <div className="">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Categories
+                            Divisions
                         </h2>
                         <p className="text-sm text-gray-400">
-                            Manage your tour categories
+                            Manage all divisions
                         </p>
                     </div>
-                    <AddTourTypeModal></AddTourTypeModal>
+                    <AddDivisionModal></AddDivisionModal>
                 </div>
 
                 <Table>
@@ -58,13 +46,16 @@ const AddTourType = () => {
                         <TableRow className=" font-extrabold">
                             <TableHead className="w-16">SL</TableHead>
                             <TableHead className=" font-extrabold">Name</TableHead>
+                            <TableHead className=" font-extrabold">Image</TableHead>
+                            <TableHead className=" font-extrabold">Details</TableHead>
+                            <TableHead className=" font-extrabold">Slug</TableHead>
                             <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     {/* Body */}
                     <TableBody>
-                        {data?.map((item: { _id: string; name: string }, index: number) => (
+                        {data?.map((item: { _id: string; name: string, description: string, slug: string, }, index: number) => (
                             <TableRow
                                 key={index}
                                 className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -77,10 +68,26 @@ const AddTourType = () => {
                                     {item?.name}
                                 </TableCell>
 
+                                <TableCell className="font-medium text-gray-400 ">
+                                    <img
+                                        src={item?.thumbnail || "/dummy-image.png"}
+                                        alt="thumbnail"
+                                        className="w-15 h-15 rounded-full object-cover"
+                                    />
+                                </TableCell>
+
+                                <TableCell className="font-medium text-gray-400 ">
+                                    {item?.description?.split(" ").slice(0, 9).join(" ")}
+                                </TableCell>
+
+                                <TableCell className="font-medium text-gray-400 ">
+                                    {item?.slug}
+                                </TableCell>
+
                                 <TableCell>
                                     <div className="flex justify-end">
                                         <DeleteConfirmation
-                                            onConfirm={() => handleRemoveTourType(item._id)}
+                                            onConfirm={() => handleRemoveDivision(item._id)}
                                         >
                                             <button className="p-2 rounded-md hover:bg-gray-100    ">
                                                 <Trash2 className="w-4 h-4 text-red-300 hover:text-red-600 " />
@@ -97,4 +104,4 @@ const AddTourType = () => {
     );
 };
 
-export default AddTourType;
+export default AddDivision;
